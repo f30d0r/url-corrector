@@ -2,7 +2,7 @@
 /*
  * Plugin Name: URI Corrector
  * Description: Correct Fancy URLs in GetSimple CMS
- * Version: 1.0
+ * Version: 1.1
  * Author: f30d0r
  * Author Site: http://feodor.me
  * Author GitHUB: https://github.com/f30d0r
@@ -12,11 +12,11 @@
 $url_corrector_file = basename(__FILE__, ".php");
 $url_corrector_dir	= dirname(__FILE__);
 
-$url_corrector_lang_en = array(
+$uc_lang_en = array(
 	"PLUGIN_DESCRIPTION" => "Correct Fancy URLs in GetSimple CMS",
 	"PRETTYURLS_OFF" => "Fancy URLs if off. <b>URL Corrector</b> plugin can't work!"
 );
-$url_corrector_lang_ru = array(
+$uc_lang_ru = array(
 	"PLUGIN_DESCRIPTION" => "Корректирует непраильные URL.",
 	"PRETTYURLS_OFF" => "ЧПУ отклчены. <b>URL Corrector</b> не работает!"
 );
@@ -24,9 +24,9 @@ $url_corrector_lang_ru = array(
 if (file_exists($url_corrector_dir."/".$url_corrector_file."/lang/".$LANG.".php")) {
 	include_once $url_corrector_dir."/".$url_corrector_file."/lang/".$LANG.".php";
 } else if ($LANG == "ru_RU") {
-	$uc_i18n = $url_corrector_lang_ru;
+	$uc_i18n = $uc_lang_ru;
 } else {
-	$uc_i18n = $url_corrector_lang_en;
+	$uc_i18n = $uc_lang_en;
 }
 
 # register plugin
@@ -44,7 +44,6 @@ register_plugin(
 add_action('index-post-dataindex','url_corrector_init');
 add_action('header-body','url_corrector_backend');
 
-
 # functions
 function url_corrector_message($msg,$error=false,$backup=null){ ?>
 	<script type="text/javascript">
@@ -61,7 +60,7 @@ if ($PRETTYURLS == "") {
 }
 
 function url_corrector_redirect($url='') {
-  if (isset($_SERVER['REDIRECT_URL']) and $url!=$_SERVER['REDIRECT_URL']) {
+  if (isset($_GET['id']) and !preg_match("/".preg_quote($_SERVER['HTTP_HOST'],'/').preg_quote($_SERVER['REQUEST_URI'],'/')."$/",$url)) {
     header("HTTP/1.1 301 Moved Permanently");
     header("Location: ".$url);
     die();
@@ -77,8 +76,7 @@ function url_corrector_init() {
 
 	$id    						 = $_GET['id'];
 	$parent						 = $pagesArray[$id]['parent'];
-	$https 						 = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off');
-	$url   						 = ($https?"https":"http")."://".$_SERVER['HTTP_HOST']."/";
+	$url   						 = get_site_url(false);
 	$urn							 = "";
 	$query						 = "";
 
@@ -86,26 +84,20 @@ function url_corrector_init() {
 
 	foreach ($_GET as $key => $val) {
 		if ($key!='id') {
-			$query .= (($i==0)?'?':'&').$key.'='.urlencode($val);
+			$query .= (($i==0)?'?':'&').$key.(($val!="")?('='.urlencode($val)):"");
 			$i++;
 		}
 	}
-
-  if(isset($PERMALINK) and $PERMALINK != ""){
-    $urn_mask = var_out($PERMALINK);
-  } else {
-    $urn_mask = "%parent%/%slug%/";
-  }
 
   if ($id == "" or $id == "index") {
     url_corrector_redirect(preg_replace("/\/$/","",$url.$query));
     return true;
   } else if ($parent=="") {
-    url_corrector_redirect($url.$id."/".$query);
+    url_corrector_redirect(find_url($id)."/".$query);
     return true;
   } else {
     $urn = str_replace(array("%slug%","%parent%"), array($id,$parent), $urn_mask);
-    url_corrector_redirect($url.$urn.$query);
+    url_corrector_redirect(find_url($id,$parent).$query);
     return true;
   }
 }
