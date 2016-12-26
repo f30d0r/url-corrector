@@ -2,7 +2,7 @@
 /*
  * Plugin Name: URI Corrector
  * Description: Correct Fancy URLs in GetSimple CMS
- * Version: 1.1
+ * Version: 1.2
  * Author: f30d0r
  * Author Site: http://feodor.me
  * Author GitHUB: https://github.com/f30d0r
@@ -33,7 +33,7 @@ if (file_exists($url_corrector_dir."/".$url_corrector_file."/lang/".$LANG.".php"
 register_plugin(
 	$url_corrector_file, //Plugin id
 	'URL Corrector', 	//Plugin name
-	'1.0', 		//Plugin version
+	'1.2', 		//Plugin version
 	'f30d0r',  //Plugin author
 	'https://github.com/f30d0r', //author website
 	$uc_i18n['PLUGIN_DESCRIPTION'], //Plugin description
@@ -74,11 +74,11 @@ function url_corrector_init() {
     return false;
   }
 
-	$id    						 = $_GET['id'];
-	$parent						 = $pagesArray[$id]['parent'];
-	$url   						 = get_site_url(false);
-	$urn							 = "";
-	$query						 = "";
+	$id    	= $_GET['id'];
+	$parent = $pagesArray[$id]['parent'];
+	$url   	= get_site_url(false);
+	$urn		= "";
+	$query	= "";
 
 	$i = 0;
 
@@ -93,7 +93,7 @@ function url_corrector_init() {
     url_corrector_redirect(preg_replace("/\/$/","",$url.$query));
     return true;
   } else if ($parent=="") {
-    url_corrector_redirect(find_url($id)."/".$query);
+    url_corrector_redirect(find_url($id).$query);
     return true;
   } else {
     $urn = str_replace(array("%slug%","%parent%"), array($id,$parent), $urn_mask);
@@ -111,6 +111,6 @@ function url_corrector_backend() {
 }
 
 function backend_init() {
-
+	redirect('plugins.php');
 }
 ?>
