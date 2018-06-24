@@ -12,15 +12,12 @@ It's unacceptable for search optimization, because for search engines it's looks
 
 URL Corrector plugin created to solve this problem. If fancy URLs are enabled in settings menu, plugin correct any incorrect URL by pattern, that defined in settings menu. By default it's `%parent%/%slug%/`
 
-Plugin works on English and Russian languages. For adding any other language you can create in plugins directory a new folder and name it by plugin's filename. In this folder you need to create `lang` folder, where you can create language file.
-For example `plugins/url_corrector/lang/un_US.php`
+### Changelog
+**2.0**  
+* Refactoring. All known bugs fixed. Now plugin compatible with PHP 7.
 
-In this file you need to describe `$uc_i18n` variable that must be an array.
-```php
-<?php
-  $uc_i18n = array(
-  	"PLUGIN_DESCRIPTION" => "Correct Fancy URLs in GetSimple CMS",
-  	"PRETTYURLS_OFF" => "Fancy URLs if off. <b>URL Corrector</b> plugin can't work!"
-  );
-?>
-```
+**1.2**  
+* Fixed a bug with the double slash.  
+
+**1.1**  
+* Fix for problem with GS installation in folder on domain.
